@@ -4,7 +4,9 @@ Linux AMD64 / NVIDIA GPU image with WildRig Multi **0.51.2**, downloaded from it
 
 ## SaladCloud 设置
 
-镜像地址：`ghcr.io/entropic-silence/pearl-salad:latest`。首次发布后必须将 GitHub Packages 中的包可见性设为 Public，方可免登录拉取；仓库公开不代表包自动公开。
+镜像地址：`ghcr.io/entropic-silence/pearl-salad:latest`。已发布为 Public，2026-09-17 匿名访问镜像清单验证通过，无需 GitHub 令牌。若自行 fork 并发布，请检查新包的可见性，仓库公开不代表包一定公开。
+
+已验证版本摘要：`sha256:81b865bbe3599980c0ac0148c9bf1f65bac993f3dff28b5b6dd54fac4df9793a`。
 
 1. Image Source 选 Public Registry，粘贴镜像地址；保留 Image Caching。
 2. Replicas 先填 **1**。选择 NVIDIA RTX GPU，初测建议 RTX 3090 或 4090；2 vCPU、8 GiB RAM 作为初始资源设置，按实测调整。RTX 50 系列需要匹配 CUDA 12.8 的主机驱动，先验证单卡。
