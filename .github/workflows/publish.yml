@@ -1,0 +1,40 @@
+name: Build and publish GPU image
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+  packages: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test replica configuration
+        run: python3 -m unittest -v
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build locally for smoke tests
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64
+          load: true
+          tags: pearl-salad:test
+      - name: Smoke test without GPU or mining
+        run: |
+          docker run --rm --entrypoint /opt/miner/wildrig-multi pearl-salad:test --help
+          docker run --rm -e DRY_RUN=1 -e WALLET=prl1pqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq pearl-salad:test
+      - name: Push tested image
+        run: |
+          IMAGE="ghcr.io/${GITHUB_REPOSITORY,,}"
+          docker tag pearl-salad:test "$IMAGE:latest"
+          docker tag pearl-salad:test "$IMAGE:sha-$GITHUB_SHA"
+          docker push "$IMAGE:sha-$GITHUB_SHA"
+          docker push "$IMAGE:latest"
