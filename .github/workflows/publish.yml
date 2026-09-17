@@ -29,7 +29,13 @@ jobs:
           tags: pearl-salad:test
       - name: Smoke test without GPU or mining
         run: |
-          docker run --rm --entrypoint /opt/miner/wildrig-multi pearl-salad:test --help
+          # WildRig returns 1 after printing help; verify both status and content.
+          result=0
+          docker run --rm --entrypoint /opt/miner/wildrig-multi pearl-salad:test --help > help-output.txt 2>&1 || result=$?
+          cat help-output.txt
+          test "$result" -le 1
+          grep -q 'Usage: wildrig-multi' help-output.txt
+          grep -q 'pearlhash' help-output.txt
           docker run --rm -e DRY_RUN=1 -e WALLET=prl1pqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq pearl-salad:test
       - name: Push tested image
         run: |
